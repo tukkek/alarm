@@ -35,8 +35,8 @@ def tick():
   global seconds
   if seconds>=1:
     alert()
-    schedule()
     seconds-=1
+    threading.Timer(1,tick).start()
     return
   notify(message,True)
   sound()
@@ -49,8 +49,5 @@ def parse(argument):
       return int(argument)*DURATIONS[d]
   return int(argument)
 
-def schedule():
-  threading.Timer(1,tick).start()
-
 seconds=parse(sys.argv[1])
-schedule()
+tick()
