@@ -16,7 +16,7 @@ def sound():
 def alert():
   global lastalert
   for d in DURATIONS:
-    if seconds>=DURATIONS[d]:
+    if seconds>DURATIONS[d]:
       left=round(math.ceil(seconds/DURATIONS[d]))
       if left>10 and left%10!=0:
         break
