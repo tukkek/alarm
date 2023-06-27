@@ -5,7 +5,7 @@ BELL='/usr/share/sounds/freedesktop/stereo/complete.oga'
 MINUTE=60
 DURATIONS={'h':60*MINUTE,'m':MINUTE,'s':1,}
 
-message=sys.argv[2] if len(sys.argv)>2 else 'Alarm'
+message=sys.argv[2][0].upper()+sys.argv[2][1:] if len(sys.argv)>2 else 'Alarm'
 seconds=-1
 lastalert=False
 
