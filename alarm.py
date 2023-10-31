@@ -6,15 +6,20 @@ MINUTE=60
 DURATIONS={'h':60*MINUTE,'m':MINUTE,'s':1,}
 
 message=' '.join(sys.argv[2:]) if len(sys.argv)>2 else 'Alarm'
-seconds=-1
+alarm=datetime.datetime.now()
 lastalert=False
 
 def sound():
   if os.path.exists(BELL):
     os.system('paplay '+BELL)
 
+def check():
+  n=datetime.datetime.now()
+  return 0 if n>=alarm else (alarm-n).seconds
+
 def alert(force=False):
   global lastalert
+  seconds=check()
   for d in DURATIONS:
     if seconds>DURATIONS[d]:
       left=round(math.ceil(seconds/DURATIONS[d]))
@@ -28,14 +33,12 @@ def alert(force=False):
 
 def notify(text,force=False):
   print(text)
-  if seconds>=MINUTE or force:
+  if check()>=MINUTE or force:
     os.system(f'notify-send Alarm "{text}"')
 
 def tick():
-  global seconds
-  if seconds>=1:
+  if check()>=1:
     alert()
-    seconds-=1
     threading.Timer(1,tick).start()
     return
   notify(message,True)
@@ -56,7 +59,7 @@ def parse(argument):
     raise Exception('Alarm time in the past!')
   return seconds
 
-seconds=parse(sys.argv[1])
+alarm+=datetime.timedelta(seconds=parse(sys.argv[1]))
 message=message[0].upper()+message[1:]
 alert(True)
 tick()
