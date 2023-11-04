@@ -3,7 +3,8 @@ import os,threading,sys,math,datetime
 
 BELL='/usr/share/sounds/freedesktop/stereo/complete.oga'
 MINUTE=60
-DURATIONS={'h':60*MINUTE,'m':MINUTE,'s':1,}
+HOUR=60*MINUTE
+DURATIONS={'h':HOUR,'m':MINUTE,'s':1,}
 
 message=' '.join(sys.argv[2:]) if len(sys.argv)>2 else 'Alarm'
 alarm=datetime.datetime.now()
@@ -54,9 +55,9 @@ def parse(argument):
   argument=[int(a) for a in argument]
   now=datetime.datetime.now().time()
   then=datetime.time(argument[0],argument[1])
-  seconds=(then.hour-now.hour)*DURATIONS['h']+(then.minute-now.minute)*DURATIONS['m']
+  seconds=(then.hour-now.hour)*HOUR+(then.minute-now.minute)*MINUTE
   if seconds<0:
-    raise Exception('Alarm time in the past!')
+    seconds+=24*HOUR
   return seconds
 
 alarm+=datetime.timedelta(seconds=parse(sys.argv[1]))
