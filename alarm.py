@@ -1,50 +1,50 @@
 #!/usr/bin/python3
-import os,threading,sys,math,datetime
+import os,math,datetime,simple_tray.tray,PyQt5.QtWidgets
 
-BELL='/usr/share/sounds/freedesktop/stereo/complete.oga'
 MINUTE=60
 HOUR=60*MINUTE
 DURATIONS={'h':HOUR,'m':MINUTE,'s':1,}
 
-message=' '.join(sys.argv[2:]) if len(sys.argv)>2 else 'Alarm'
-alarm=datetime.datetime.now()
-lastalert=False
+class Tray(simple_tray.tray.Tray):
+  def progress(self,seconds):
+    if seconds<10:
+      return
+    for d in DURATIONS:
+      if seconds>DURATIONS[d]:
+        left=round(math.ceil(seconds/DURATIONS[d]))
+        if left<10 or left%10==0:
+          report=f'{message} in {left}{d}...'
+          self.say(report)
+        return
+  
+  def update(self):
+    n=datetime.datetime.now()
+    seconds=0 if n>=alarm else (alarm-n).seconds
+    if seconds>0:
+      self.progress(seconds)
+      return
+    self.say(f'{message}.',True)
+    os.system('paplay bell.oga')
+    self.application.quit()
+    
+class Input(PyQt5.QtWidgets.QDialog):#https://stackoverflow.com/a/56019738
+  def __init__(self):
+    super().__init__()
+    self.setWindowTitle('Alarm')
+    l=PyQt5.QtWidgets.QFormLayout(self)
+    self.title=PyQt5.QtWidgets.QLineEdit(self)
+    l.addRow("Title:",self.title)
+    self.target=PyQt5.QtWidgets.QLineEdit(self)
+    l.addRow("Target:",self.target)
+    buttons=PyQt5.QtWidgets.QDialogButtonBox(PyQt5.QtWidgets.QDialogButtonBox.Ok)
+    l.addWidget(buttons)
+    buttons.accepted.connect(self.accept)
+    buttons.rejected.connect(self.reject)
 
-def sound():
-  if os.path.exists(BELL):
-    os.system('paplay '+BELL)
-
-def check():
-  n=datetime.datetime.now()
-  return 0 if n>=alarm else (alarm-n).seconds
-
-def alert(force=False):
-  global lastalert
-  seconds=check()
-  for d in DURATIONS:
-    if seconds>DURATIONS[d]:
-      left=round(math.ceil(seconds/DURATIONS[d]))
-      if not force and left>10 and left%10!=0:
-        break
-      text=f'{message} in {left}{d}...'
-      if lastalert!=text:
-        notify(text)
-      lastalert=text
-      break
-
-def notify(text,force=False):
-  print(text)
-  if check()>=MINUTE or force:
-    os.system(f'notify-send Alarm "{text}"')
-
-def tick():
-  if check()>=1:
-    alert()
-    threading.Timer(1,tick).start()
-    return
-  notify(message,True)
-  sound()
-
+message='Alarm'
+tray=Tray(message,'icon.png',1)
+alarm=None
+    
 def parse(argument):
   argument=argument.lower()
   for d in DURATIONS:
@@ -60,7 +60,11 @@ def parse(argument):
     seconds+=24*HOUR
   return seconds
 
-alarm+=datetime.timedelta(seconds=parse(sys.argv[1]))
-message=message[0].upper()+message[1:]
-alert(True)
-tick()
+i=Input()
+i.exec()
+message=i.title.text()
+target=i.target.text()
+if target and message:
+  alarm=datetime.datetime.now()+datetime.timedelta(seconds=parse(target)+1)
+  message=message[0].upper()+message[1:]
+  tray.start()
