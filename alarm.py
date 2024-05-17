@@ -6,26 +6,24 @@ HOUR=60*MINUTE
 DURATIONS={'h':HOUR,'m':MINUTE,'s':1,}
 
 class Tray(simple_tray.tray.Tray):
-  def progress(self,seconds):
-    if seconds<10:
-      return
-    for d in DURATIONS:
-      if seconds>DURATIONS[d]:
-        left=round(math.ceil(seconds/DURATIONS[d]))
-        if left<10 or left%10==0:
-          report=f'{message} in {left}{d}...'
-          self.say(report)
-        return
-  
-  def update(self):
+  def progress(self,force=False):
     n=datetime.datetime.now()
     seconds=0 if n>=alarm else (alarm-n).seconds
-    if seconds>0:
-      self.progress(seconds)
-      return
-    self.say(f'{message}.',True)
-    os.system('paplay bell.oga')
-    self.application.quit()
+    if seconds>=10 or force:
+      for d in DURATIONS:
+        if seconds>DURATIONS[d]:
+          left=round(math.ceil(seconds/DURATIONS[d]))
+          if left<10 or left%10==0 or force:
+            report=f'{message} in {left}{d}...'
+            self.say(report)
+          break
+    return seconds
+  
+  def update(self):
+    if self.progress()==0:
+      self.say(f'{message}.',True)
+      os.system('paplay bell.oga')
+      self.application.quit()
     
 class Input(PyQt5.QtWidgets.QDialog):#https://stackoverflow.com/a/56019738
   def __init__(self):
@@ -67,4 +65,5 @@ target=i.target.text()
 if target and message:
   alarm=datetime.datetime.now()+datetime.timedelta(seconds=parse(target)+1)
   message=message[0].upper()+message[1:]
+  tray.progress(force=True)
   tray.start()
