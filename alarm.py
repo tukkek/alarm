@@ -66,4 +66,7 @@ if target and message:
   alarm=datetime.datetime.now()+datetime.timedelta(seconds=parse(target)+1)
   message=message[0].upper()+message[1:]
   tray.progress(force=True)
+  target=PyQt5.QtWidgets.QAction()
+  target.setText(f'{message} at {alarm.strftime("%H:%M")}')
+  tray.menu.addAction(target)
   tray.start()
