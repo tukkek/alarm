@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import os,math,datetime,simple_tray.tray,PyQt5.QtWidgets
+import os,math,datetime,simple_tray.tray,PyQt6.QtWidgets,PyQt6.QtGui
 
 MINUTE=60
 HOUR=60*MINUTE
@@ -25,16 +25,18 @@ class Tray(simple_tray.tray.Tray):
       os.system('paplay bell.oga')
       self.application.quit()
     
-class Input(PyQt5.QtWidgets.QDialog):#https://stackoverflow.com/a/56019738
+class Input(PyQt6.QtWidgets.QDialog):
   def __init__(self):
     super().__init__()
     self.setWindowTitle('Alarm')
-    l=PyQt5.QtWidgets.QFormLayout(self)
-    self.title=PyQt5.QtWidgets.QLineEdit(self)
+    l=PyQt6.QtWidgets.QFormLayout(self)
+    self.title=PyQt6.QtWidgets.QLineEdit(self)
     l.addRow("Title:",self.title)
-    self.target=PyQt5.QtWidgets.QLineEdit(self)
+    self.target=PyQt6.QtWidgets.QLineEdit(self)
     l.addRow("Target:",self.target)
-    buttons=PyQt5.QtWidgets.QDialogButtonBox(PyQt5.QtWidgets.QDialogButtonBox.Ok)
+    cancel=PyQt6.QtWidgets.QDialogButtonBox.StandardButton.Cancel
+    ok=PyQt6.QtWidgets.QDialogButtonBox.StandardButton.Ok
+    buttons=PyQt6.QtWidgets.QDialogButtonBox(ok|cancel)
     l.addWidget(buttons)
     buttons.accepted.connect(self.accept)
     buttons.rejected.connect(self.reject)
@@ -66,7 +68,7 @@ if target and message:
   alarm=datetime.datetime.now()+datetime.timedelta(seconds=parse(target)+1)
   message=message[0].upper()+message[1:]
   tray.progress(force=True)
-  target=PyQt5.QtWidgets.QAction()
+  target=PyQt6.QtGui.QAction()
   target.setText(f'{message} at {alarm.strftime("%H:%M")}')
   tray.menu.addAction(target)
   tray.start()
