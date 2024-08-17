@@ -64,11 +64,13 @@ i=Input()
 i.exec()
 message=i.title.text()
 target=i.target.text()
-if target and message:
-  alarm=datetime.datetime.now()+datetime.timedelta(seconds=parse(target)+1)
-  message=message[0].upper()+message[1:]
-  tray.progress(force=True)
-  target=PyQt6.QtGui.QAction()
-  target.setText(f'{message} at {alarm.strftime("%H:%M")}')
-  tray.menu.addAction(target)
-  tray.start()
+if not target or not message:
+  message='Test'
+  target='1s'
+alarm=datetime.datetime.now()+datetime.timedelta(seconds=parse(target)+1)
+message=message[0].upper()+message[1:]
+tray.progress(force=True)
+target=PyQt6.QtGui.QAction()
+target.setText(f'{message} at {alarm.strftime("%H:%M")}')
+tray.menu.addAction(target)
+tray.start()
