@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import os,math,datetime,simple_tray.tray,PyQt6.QtWidgets,PyQt6.QtGui
+from sunformat import SunFormat
 
 MINUTE=60
 HOUR=60*MINUTE
@@ -44,9 +45,10 @@ class Input(PyQt6.QtWidgets.QDialog):
 message='Alarm'
 tray=Tray(message,'icon.png',1)
 alarm=None
+converter=SunFormat()
     
 def parse(argument):
-  argument=argument.lower()
+  argument=converter.translate(argument).lower()
   for d in DURATIONS:
     if d in argument:
       argument=argument.replace(d,'')
