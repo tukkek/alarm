@@ -8,8 +8,8 @@ DURATIONS={'h':HOUR,'m':MINUTE,'s':1,}
 
 class Tray(simple_tray.tray.Tray):
   def say(self,message,force=False):
-    super().say(message,force)
-    os.system('paplay bell.oga')
+    if super().say(message,force):
+      os.system('paplay bell.oga')
   
   def progress(self,force=False):
     n=datetime.datetime.now()
