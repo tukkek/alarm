@@ -7,6 +7,10 @@ HOUR=60*MINUTE
 DURATIONS={'h':HOUR,'m':MINUTE,'s':1,}
 
 class Tray(simple_tray.tray.Tray):
+  def say(self,message,force=False):
+    super().say(message,force)
+    os.system('paplay bell.oga')
+  
   def progress(self,force=False):
     n=datetime.datetime.now()
     seconds=0 if n>=alarm else (alarm-n).seconds
@@ -23,7 +27,6 @@ class Tray(simple_tray.tray.Tray):
   def update(self):
     if self.progress()==0:
       self.say(f'{message}.',True)
-      os.system('paplay bell.oga')
       self.application.quit()
     
 class Input(PyQt6.QtWidgets.QDialog):
