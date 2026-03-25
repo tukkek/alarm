@@ -14,7 +14,7 @@ class Tray(simple_tray.tray.Tray):
   def progress(self,force=False):
     n=datetime.datetime.now()
     seconds=0 if n>=alarm else (alarm-n).seconds
-    if seconds>=10 or force:
+    if seconds>=MINUTE or force:
       for d in DURATIONS:
         if seconds>DURATIONS[d]:
           left=round(math.ceil(seconds/DURATIONS[d]))
